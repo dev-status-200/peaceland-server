@@ -11,6 +11,7 @@ const packageRoutes = require('./routes/package');
 const bookingRoutes = require('./routes/booking');
 const promoRoutes = require('./routes/promo');
 const customersRoutes = require('./routes/customers');
+const { HotelForm, Rooms } = require('./associations/bookingaccociations');
 
 app.use(morgan('tiny'));
 app.use(cors());

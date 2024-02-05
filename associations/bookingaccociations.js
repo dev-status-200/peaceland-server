@@ -1,8 +1,27 @@
 const { DataTypes } = require('sequelize');
 
-const { BookedTours, Reservations, TourOptions, Tours, BookedToursOptions, Customers, MyOffers, Promos } = require("../models");
+const { 
+    BookedTours, Reservations, 
+    VisaForm, Rooms, HotelForm,
+    TourOptions, Tours, BookedToursOptions, 
+    Customers, MyOffers, Promos, VisaPersons, 
+} = require("../models");
 
 // ============================ CLIENTS TO ORDERS ASSOCIATIONS ============================ //
+
+HotelForm.hasMany(Rooms,{
+    foriegnKey:{
+        type: DataTypes.INTEGER
+    }
+});
+Rooms.belongsTo(HotelForm);
+
+VisaForm.hasMany(VisaPersons,{
+    foriegnKey:{
+        type: DataTypes.INTEGER
+    }
+});
+VisaPersons.belongsTo(VisaForm);
 
 Reservations.hasMany(BookedTours,{
     foriegnKey:{
@@ -49,7 +68,6 @@ Promos.hasMany(MyOffers,{
 });
 MyOffers.belongsTo(Promos);
 
-
 Tours.hasMany(TourOptions,{
     foriegnKey:{
         type: DataTypes.INTEGER
@@ -57,5 +75,4 @@ Tours.hasMany(TourOptions,{
 });
 TourOptions.belongsTo(Tours);
 
-
-module.exports = { BookedTours, TourOptions, BookedToursOptions, MyOffers }
+module.exports = { BookedTours, TourOptions, BookedToursOptions, MyOffers, VisaForm, VisaPersons, HotelForm, Rooms }

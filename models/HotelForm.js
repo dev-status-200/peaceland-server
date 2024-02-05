@@ -1,15 +1,30 @@
 module.exports = (sequelize, DataTypes) => {
     const HotelForm = sequelize.define("HotelForm", {
+        name:{
+            type:DataTypes.STRING
+        },
+        email:{
+            type:DataTypes.STRING
+        },
+        contact:{
+            type:DataTypes.STRING
+        },
+        whatsapp:{
+            type:DataTypes.STRING
+        },
+        nationality:{
+            type:DataTypes.STRING
+        },
         rating:{
             type:DataTypes.STRING
         },
-        rooms:{
+        destination:{
             type:DataTypes.STRING
         },
-        adults:{
+        hotel:{
             type:DataTypes.STRING
         },
-        children:{
+        currency:{
             type:DataTypes.STRING
         },
         checkin:{
@@ -18,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         checkout:{
             type:DataTypes.STRING
         },
-        email:{
+        nights:{
             type:DataTypes.STRING
         },
         done:{

@@ -1,8 +1,8 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
 const key = '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';
-const { BookedTours, BookedToursOptions, TourOptions } = require('../../associations/bookingaccociations');
-const { Reservations, Customers, Transport, HotelForm } = require('../../models');
+const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
+const { Reservations, Customers, Transport } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
 const moment = require("moment");
 const stripe = require('stripe')('sk_test_51LLnm5AckUCD1b2U12xLKiqgm0IfjVzDmqPfS84MYtmTwNjUgUMx6c0PTMNjhWvbjBPhriAuHwe7ozzCjUgO8xvk00aHtMtqoC');
@@ -269,8 +269,12 @@ routes.post("/reverse", async(req, res) => {
 
 routes.post("/bookHotel", async(req, res) => {
     try {
-        const result = await HotelForm.create({...req.body})
-        res.json({status:"success", result});
+        console.log(req.body)
+        const result = await HotelForm.create({...req.body});
+        req.body.rooms.forEach((x)=>{
+            Rooms.create({...x, HotelFormId:result.id});
+        })
+        res.json({status:"success"});
     } catch (error) {
         res.json({status:'error', result:error});
     }
@@ -288,11 +292,38 @@ routes.get("/getHotelForms", async(req, res) => {
         res.json({status:'error', result:error});
     }
 });
+
 routes.get("/markHotelQueryDOne", async(req, res) => {
     try {
         const result = await HotelForm.update(
             { done:'1'}, { where:{id:req.headers.id} }
         )
+        res.json({status:"success", result});
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.post("/createVisaForm", async(req, res) => {
+    try {
+        //VisaForm, VisaPersons
+        const result = await VisaForm.create();
+        req.body.persons.forEach((x)=>{
+            VisaPersons.create({
+                ...x, VisaFormId:result.id
+            })
+        })
+        res.json({status:"success", result});
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.get("/getVisaForms", async(req, res) => {
+    try {
+        const result = await VisaForm.findAll({
+            include:[{ model:VisaPersons }]
+        });
         res.json({status:"success", result});
     } catch (error) {
         res.json({status:'error', result:error});
