@@ -286,6 +286,9 @@ routes.get("/getHotelForms", async(req, res) => {
             order: [
                 ["createdAt", "DESC"],
             ],
+            include:[{
+                model:Rooms
+            }]
         })
         res.json({status:"success", result});
     } catch (error) {

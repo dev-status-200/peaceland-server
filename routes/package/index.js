@@ -274,11 +274,31 @@ routes.get("/getTourInventoryStatus", async(req, res)=>{
                         model:Inventory,
                         where:{used:false}
                     },
-                    {model:History}
+                    {
+                        order: [
+                            ["createdAt", "DESC"],
+                        ],
+                        limit:1,
+                        model:History
+                    }
                 ]
             }]
         });
         res.json({status:'success', result:result});
+    } catch (error) {
+        res.json({status:'error'})
+    }
+});
+
+routes.post("/removeInventory", async(req, res)=>{
+    try {
+        const result = await Inventory.destroy({
+            where:{code:req.body}
+        });
+        res.json({
+            status:'success', 
+            result:result
+        });
     } catch (error) {
         res.json({status:'error'})
     }
