@@ -195,7 +195,7 @@ routes.get("/getBySlug", async(req, res)=>{
             where:{slug:req.headers.id},
             attributes:[
                 'id', 'title' , 'availability', 'duration', 'time_slot', 'confirmation',
-                'refund', 'voucher', 'lang','city','destination', 'prevPrice',
+                'refund', 'voucher', 'lang','city','destination',
                 'main_image', 'departure', 'reporting', 'slug'
             ]
         })
@@ -211,7 +211,7 @@ routes.get("/getDetailsById", async(req, res)=>{
             where:{id:req.headers.id},
             attributes:[
                 'cancellation_polices', 'more_images', 'main_image', 'advCategory', 'category',
-                'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'tour_detail'
+                'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'tour_detail', 'prevPrice'
             ],
             include:[{
                 model:TourOptions,
