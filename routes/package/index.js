@@ -81,7 +81,7 @@ routes.post("/create", async(req, res)=>{
     let data = req.body;
     data.status=1
     try {
-        const result = await Tours.create({...data, slug:`${data.title}`.toLowerCase().replace(/\s+/g, '-')});
+        const result = await Tours.create({...data, destination:'uae', slug:`${data.title}`.toLowerCase().replace(/\s+/g, '-')});
         await TourOptions.bulkCreate(createPackages(data.packages, result.id))
         res.json({status:'success', result:result})
     } catch (error) {
@@ -335,6 +335,9 @@ routes.get("/searchTourPeaceland", async(req, res) => {
         req.headers.destination?obj.destination = req.headers.destination:null;
         req.headers.category?obj.category = req.headers.category:null;
         req.headers.city?obj.city = req.headers.city:null;
+
+        console.log(obj)
+
         const result = await Tours.findAll({
             attributes:['id','title','main_image','category','advCategory', 'slug', 'city', 'destination'],
             where:obj,
@@ -344,6 +347,7 @@ routes.get("/searchTourPeaceland", async(req, res) => {
                 attributes:['id','adult_price']
             }]
         });
+        console.log(result)
         res.json({status:'success', result:result});
     } catch (error) {
         res.json({status:'error', result:error})

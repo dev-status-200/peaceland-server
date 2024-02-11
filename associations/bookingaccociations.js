@@ -4,10 +4,18 @@ const {
     BookedTours, Reservations, 
     VisaForm, Rooms, HotelForm,
     TourOptions, Tours, BookedToursOptions, 
-    Customers, MyOffers, Promos, VisaPersons, 
+    Customers, MyOffers, Promos, VisaPersons,
+    City, Destination
 } = require("../models");
 
 // ============================ CLIENTS TO ORDERS ASSOCIATIONS ============================ //
+
+Destination.hasMany(City,{
+    foriegnKey:{
+        type: DataTypes.INTEGER
+    }
+});
+City.belongsTo(Destination);
 
 HotelForm.hasMany(Rooms,{
     foriegnKey:{
@@ -75,4 +83,4 @@ Tours.hasMany(TourOptions,{
 });
 TourOptions.belongsTo(Tours);
 
-module.exports = { BookedTours, TourOptions, BookedToursOptions, MyOffers, VisaForm, VisaPersons, HotelForm, Rooms }
+module.exports = { BookedTours, TourOptions, BookedToursOptions, MyOffers, VisaForm, VisaPersons, HotelForm, Rooms, City, Destination }

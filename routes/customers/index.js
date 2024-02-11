@@ -2,7 +2,7 @@ const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
 const key = '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';
 const { BookedTours, BookedToursOptions, MyOffers } = require('../../associations/bookingaccociations');
-const { Reservations, Customers, ContactUs } = require('../../models');
+const { Reservations, Customers, ContactUs, Notifications } = require('../../models');
 
 const sendMail = (reciever, sub, content) => {
     const client = Sib.ApiClient.instance
@@ -112,8 +112,11 @@ routes.post("/allowReview", async(req, res)=>{
 
 routes.post("/contactUs", async(req, res)=>{
     try {
-        console.log(req.body)
-        const result = await ContactUs.create({...req.body})
+        await ContactUs.create({...req.body});
+        Notifications.create({
+            description:"A Contact Us Form has been submitted",
+            checked:"0"
+        })
         res.json({status:'success'})
     } catch (error) {
         res.json({status:'error', result:error});

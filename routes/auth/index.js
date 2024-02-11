@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const verify = require('../../functions/tokenVerification')
-const { Users } = require('../../models');
+const { Users, Notifications } = require('../../models');
 
 routes.post("/login", async(req, res)=>{
     console.log(req.body);
@@ -25,5 +25,19 @@ routes.post("/login", async(req, res)=>{
 });
 
 routes.get("/verifyLogin", verify, (req, res) => { res.json({isLoggedIn:true, username:req.body.username}) });
+
+routes.get("/getNotifications", async(req, res)=>{
+  try {
+    const result = await Notifications.findAll({
+      limit:100,
+      order: [
+        ["createdAt", "DESC"],
+    ],
+    });
+    res.json({status:'success', result})
+  } catch (error) {
+    res.json({status:'error'})
+  }
+});
 
 module.exports = routes;

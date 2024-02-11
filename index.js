@@ -10,8 +10,9 @@ const authRoutes = require('./routes/auth');
 const packageRoutes = require('./routes/package');
 const bookingRoutes = require('./routes/booking');
 const promoRoutes = require('./routes/promo');
+const destinationsRoutes = require('./routes/destinations');
 const customersRoutes = require('./routes/customers');
-const { HotelForm, Rooms } = require('./associations/bookingaccociations');
+// const { City, Destination } = require('./associations/bookingaccociations');
 
 app.use(morgan('tiny'));
 app.use(cors());
@@ -29,6 +30,7 @@ app.use("/transport", transportRoutes);
 app.use("/bookings", bookingRoutes);
 app.use("/promo", promoRoutes);
 app.use("/customer", customersRoutes);
+app.use("/destinations", destinationsRoutes);
 
 const PORT = process.env.PORT || 8080;
 
