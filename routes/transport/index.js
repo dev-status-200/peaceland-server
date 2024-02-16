@@ -2,10 +2,11 @@ const routes = require('express').Router();
 const { Transport } = require('../../models');
 
 routes.post("/create", async(req, res)=>{
+    
     let data = req.body;
     try {
         delete data.id
-        const result = await Transport.create(data)
+        const result = await Transport.create({...data, editable:'1'})
         res.json({status:'success', result:result})
     } catch (error) {
         res.json({status:'error', result:error})

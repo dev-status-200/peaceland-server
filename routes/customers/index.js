@@ -115,7 +115,8 @@ routes.post("/contactUs", async(req, res)=>{
         await ContactUs.create({...req.body});
         Notifications.create({
             description:"A Contact Us Form has been submitted",
-            checked:"0"
+            checked:"0",
+            type:'message'
         })
         res.json({status:'success'})
     } catch (error) {

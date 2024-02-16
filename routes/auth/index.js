@@ -29,6 +29,21 @@ routes.get("/verifyLogin", verify, (req, res) => { res.json({isLoggedIn:true, us
 routes.get("/getNotifications", async(req, res)=>{
   try {
     const result = await Notifications.findAll({
+      where:{checked:'0'},
+      // limit:50,
+      order: [
+        ["createdAt", "DESC"],
+    ],
+    });
+    res.json({status:'success', result})
+  } catch (error) {
+    res.json({status:'error'})
+  }
+});
+
+routes.get("/getPast100Activity", async(req, res)=>{
+  try {
+    const result = await Notifications.findAll({
       limit:100,
       order: [
         ["createdAt", "DESC"],

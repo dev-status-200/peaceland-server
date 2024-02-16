@@ -121,7 +121,8 @@ routes.post("/createReservation", async(req, res) => {
         })
         Notifications.create({
             description:"A Tour Booking has been made",
-            checked:"0"
+            checked:"0",
+            type:'tour'
         })
         res.json({status:"success", result:{id:result.id, no:result.booking_no}});
     } catch (error) {
@@ -279,7 +280,8 @@ routes.post("/bookHotel", async(req, res) => {
         });
         Notifications.create({
             description:"A Hotel Booking Created",
-            checked:"0"
+            checked:"0",
+            type:'hotel'
         })
         res.json({status:"success"});
     } catch (error) {
@@ -306,7 +308,7 @@ routes.get("/getHotelForms", async(req, res) => {
 routes.get("/markHotelQueryDOne", async(req, res) => {
     try {
         const result = await HotelForm.update(
-            { done:'1'}, { where:{id:req.headers.id} }
+            { done:req.headers.status=="1"?'0':'1'}, { where:{id:req.headers.id} }
         )
         res.json({status:"success", result});
     } catch (error) {
@@ -325,7 +327,8 @@ routes.post("/createVisaForm", async(req, res) => {
         });
         Notifications.create({
             description:"A Visa Form Has Been",
-            checked:"0"
+            checked:"0",
+            type:'visa'
         });
         res.json({status:"success", result});
     } catch (error) {
@@ -336,9 +339,25 @@ routes.post("/createVisaForm", async(req, res) => {
 routes.get("/getVisaForms", async(req, res) => {
     try {
         const result = await VisaForm.findAll({
-            include:[{ model:VisaPersons }]
+            include:[{ model:VisaPersons }],
+            order: [[ 'createdAt', 'DESC' ]]
         });
         res.json({status:"success", result});
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.post("/checkNotification", async(req, res) => {
+    try {
+        console.log(req.body.type)
+        const result = await Notifications.update({
+            checked:'1'
+        }, {where:{
+            checked:'0',
+            type:req.body.type
+        }});
+        res.json({status:"success"});
     } catch (error) {
         res.json({status:'error', result:error});
     }

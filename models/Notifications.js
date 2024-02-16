@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         checked:{
             type:DataTypes.STRING
+        },
+        type:{
+            type:DataTypes.STRING
         }
     })
     return Notifications
