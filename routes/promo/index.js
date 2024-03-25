@@ -46,6 +46,15 @@ routes.post("/edit", async(req, res) => {
     }
 });
 
+routes.post("/toggleVisibility", async(req, res) => {
+    try {
+        const result = await Promos.update({show:req.body.show}, {where:{id:req.body.id}});
+        res.json({status:'success', result:result})
+    } catch (error) {
+        res.json({status:'error', result:error})
+    }
+});
+
 routes.get("/getPromos", async(req, res)=>{
     try {
         console.log(moment().format("YYYY-MM-DD"))
@@ -55,6 +64,25 @@ routes.get("/getPromos", async(req, res)=>{
                 validity: {
                     [Op.gte]: moment(moment().format("YYYY-MM-DD")).toDate(),
                     //[Op.lte]: moment("2023-06-20").add(1, 'days').toDate(),
+                  }
+            },
+            order: [
+                ["createdAt", "DESC"],
+            ],
+        })
+        res.json({status:'success', result:result})
+    } catch (error) {
+        res.json({status:'error'})
+    }
+});
+
+routes.get("/getVisiblePromos", async(req, res)=>{
+    try {
+        const result = await Promos.findAll({
+            where:{
+                show:"1",
+                validity: {
+                    [Op.gte]: moment(moment().format("YYYY-MM-DD")).toDate(),
                   }
             },
             order: [
@@ -98,7 +126,7 @@ routes.get("/getMyPromos", async(req, res)=>{
 routes.get("/get", async(req, res)=>{
     try {
         const result = await Promos.findAll({
-            order: [['updatedAt', 'DESC']]
+            order: [['createdAt', 'DESC']]
         })
         res.json({status:'success', result:result})
     } catch (error) {
@@ -108,11 +136,14 @@ routes.get("/get", async(req, res)=>{
 
 routes.post("/sendOffer", async(req, res) => {
     try {
+        console.log(req.body.list);
+        console.log(req.body.content);
+
         let temparray = [...req.body.list];
         temparray.forEach((x)=>{
             x.description = req.body.content
         })
-        await MyOffers.bulkCreate(temparray);
+        await MyOffers.bulkCreate(temparray).catch((x)=>console.log(x))
         req.body.list.forEach(async(x)=>{
             await sendMail(x.email, "Promotional Offer From Tickets Valley", req.body.content)
         })
@@ -129,9 +160,13 @@ routes.post("/verifyPromo", async(req, res)=>{
                 code:req.body.code, status:"1"
             }
         })
-        //console.log(moment().diff("2023-02-06T12:09:36.000Z", 'days'))
-        //console.log(moment().isBetween(result.createdAt, result.validity, undefined, '[]'))
-        res.json({status:'success', result:result})
+        let date1 = moment(result.dataValues.validity).format("MM-DD-yyyy");
+        let date2 = moment().format("MM-DD-yyyy");
+        let difference = moment(date1).diff(moment(date2), 'days')
+        console.log(difference<0?'Not Applicable':'Applicable')
+        console.log(date1, 'validity')
+        console.log(date2, 'current date')
+        res.json({status:'success', result:difference<0?{stock:0}:result})
     } catch (error) {
         res.json({status:'error', error:error})
     }
@@ -145,6 +180,5 @@ routes.post("/testmail", async(req, res) => {
         res.json({status:'error'})
     }
 });
-
 
 module.exports = routes;

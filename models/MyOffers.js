@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     const MyOffers = sequelize.define("MyOffers", {
         description:{
-            type:DataTypes.STRING,
+            type:DataTypes.TEXT,
             allowNull: false,
             unique: true
         },

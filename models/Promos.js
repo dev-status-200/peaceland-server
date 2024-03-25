@@ -49,6 +49,14 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         },
+        used:{
+            type:DataTypes.STRING,
+            defaultValue: '0',
+        },
+        show:{
+            type:DataTypes.STRING,
+            defaultValue: '0',
+        },
     })
     return Promos
 }

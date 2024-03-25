@@ -56,7 +56,32 @@ module.exports = (sequelize, DataTypes) => {
         },
         city:{
             type:DataTypes.STRING,
-        }
+        },
+        package:{
+            type:DataTypes.STRING,
+            defaultValue: '1'
+        },
+        packageTravel:{
+            type:DataTypes.STRING,
+            defaultValue: '1'
+        },
+        packageCountry:{
+            type:DataTypes.STRING,
+            defaultValue: '1'
+        },
+        packageCity:{
+            type:DataTypes.STRING,
+            defaultValue: '1'
+        },
+        packageDescription:{
+            type:DataTypes.TEXT,
+        },
+        packageIncludes:{
+            type:DataTypes.TEXT,
+        },
+        travelDetail:{
+            type:DataTypes.TEXT,
+        },
     })
     return Tours
 }

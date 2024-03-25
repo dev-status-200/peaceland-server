@@ -77,7 +77,6 @@ const setRecords = (data, user) => {
 }
 
 routes.post("/create", async(req, res)=>{
-
     let data = req.body;
     data.status=1
     try {
@@ -114,7 +113,7 @@ routes.post("/edit", async(req, res) => {
         }
         await Tours.update({...data, slug:`${data.title}`.toLowerCase().replace(/\s+/g, '-')}, {where:{id:data.id}})
         await TourOptions.bulkCreate(createupdatedPackages(data.packages, data.id), {
-            updateOnDuplicate: ["name","child_price","adult_price","status","dates","dated", "timed","timeSlots",'transport','manual','oldPrice', 'detail'],
+            updateOnDuplicate: ["name", "child_price", "adult_price", "status", "dates", "dated", "timed", "timeSlots", "transport", "manual", "oldPrice", "detail"],
         });
         await TourOptions.bulkCreate(createPackages(data.packages, data.id))
         const resultTwo = await Tours.findOne({
@@ -131,8 +130,27 @@ routes.post("/edit", async(req, res) => {
 
 routes.get("/get", async(req, res)=>{
     try {
+        console.log()
+        let type = req.headers.type
         const result = await Tours.findAll({
-            attributes:['id', 'main_image', 'title', 'category']
+            where:{package:type=="package"?"1":"0"},
+            attributes:['id', 'main_image', 'title', 'category', 'status']
+        })
+        res.json({status:'success', result:result})
+    } catch (error) {
+        res.json({status:'error'})
+    }
+});
+
+routes.get("/getPackagesClient", async(req, res)=>{
+    try {
+        const result = await Tours.findAll({
+            where:{package:"1", status:'1'},
+            attributes:[
+                'id', 'main_image', 'title', 'packageTravel',
+                'packageCountry', 'packageCity', 'packageDescription',
+                'packageIncludes', 'prevPrice', 'slug'
+            ]
         })
         res.json({status:'success', result:result})
     } catch (error) {
@@ -198,6 +216,8 @@ routes.get("/getBySlug", async(req, res)=>{
                 'refund', 'voucher', 'lang','city','destination',
                 'main_image', 'departure', 'reporting', 'slug'
             ]
+        }).catch((x)=>{
+            console.log(x)
         })
         res.json({status:'success', result:result})
     } catch (error) {
@@ -207,16 +227,16 @@ routes.get("/getBySlug", async(req, res)=>{
 
 routes.get("/getDetailsById", async(req, res)=>{
     try {
+        const includes = req.headers.type=="product"? [{ model:TourOptions, where:{status:"1"} }]:[]
         const result = await Tours.findOne({
             where:{id:req.headers.id},
             attributes:[
                 'cancellation_polices', 'more_images', 'main_image', 'advCategory', 'category',
-                'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'tour_detail', 'prevPrice'
+                'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'tour_detail', 'prevPrice',
+                'travelDetail', 'packageIncludes', 'packageDescription', 'packageCity', 'packageCountry',
+                'packageTravel'
             ],
-            include:[{
-                model:TourOptions,
-                where:{status:"1"}
-            }]
+            include:includes
         })
         res.json({status:'success', result:result})
     } catch (error) {
@@ -237,7 +257,12 @@ routes.get("/getAllIds", async(req, res)=>{
 
 routes.get("/getAllSlugs", async(req, res)=>{
     try {
+        const type = req.headers.type
+        console.log(type)
         const result = await Tours.findAll({
+            where:{
+                package:type=="package"?'1':'0'
+            },
             attributes:['slug', 'id'],
         });
         res.json({status:'success', result:result});
@@ -339,7 +364,7 @@ routes.get("/searchTourPeaceland", async(req, res) => {
         console.log(obj)
 
         const result = await Tours.findAll({
-            attributes:['id','title','main_image','category','advCategory', 'slug', 'city', 'destination'],
+            attributes:['id','title','main_image','category','advCategory', 'slug', 'city', 'destination', 'duration'],
             where:obj,
             include:[{
                 model:TourOptions,
@@ -366,7 +391,7 @@ routes.get("/searchTour", async(req, res) => {
             }
         }
         const result = await Tours.findAll({
-            attributes:['id','title','main_image','category','advCategory'],
+            attributes:['id', 'title', 'main_image', 'category', 'advCategory', 'duration'],
             where:{
                 destination:req.headers.destination,
                 city:req.headers.city
@@ -465,19 +490,5 @@ routes.get("/tourSearch", async(req, res)=>{
         res.json({status:'error'})
     }
 });
-
-// routes.post("/tourNameChange", async(req, res)=>{
-//     try {
-//         const result = await Tours.findAll({
-//             attributes:['title', 'id']
-//         })
-//         result.map(async(x)=>{
-//             await Tours.upsert({ id:x.id, slug:`${x.title}`.toLowerCase().replace(/\s+/g, '-') })
-//         });
-//         res.json({status:'success'})
-//     } catch (error) {
-//         res.json({status:'error'})
-//     }
-// });
 
 module.exports = routes;

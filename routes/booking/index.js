@@ -2,7 +2,7 @@ const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
 const key = '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';
 const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
-const { Reservations, Customers, Transport, Notifications } = require('../../models');
+const { Reservations, Customers, Transport, Notifications, Promos } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
 const moment = require("moment");
 const stripe = require('stripe')('sk_test_51LLnm5AckUCD1b2U12xLKiqgm0IfjVzDmqPfS84MYtmTwNjUgUMx6c0PTMNjhWvbjBPhriAuHwe7ozzCjUgO8xvk00aHtMtqoC');
@@ -66,7 +66,7 @@ routes.post("/create", async(req, res) => {
             <p>Regards</p>
             <p>Ticket Valley Team</p>`
         
-        await sendMail(req.body.user, 'Booking Info', content);
+        //await sendMail(req.body.user, 'Booking Info', content);
         res.json({status:'success', result:"result"})
     } catch (error) {
         res.json({status:'error', result:error})
@@ -98,6 +98,17 @@ routes.post("/create-intent", async(req, res) => {
 
 routes.post("/createReservation", async(req, res) => {
     try {
+        let promo = req.body.reservation?.promo;
+        if(promo!='none'){
+            let promoId = JSON.parse(req.body.reservation?.promo).id;
+            console.log(promoId)
+            const promoStock = await Promos.findOne({where:{id:promoId}});
+            // console.log(promoStock.dataValues);
+            let stock = parseInt(promoStock.dataValues.stock)-1;
+            let used = parseInt(promoStock.dataValues.used)+1||1;
+            // console.log(stock)
+            Promos.update({stock:`${stock}`, used:`${used}`}, { where:{id:promoId} })
+        }
         let customer;
         customer = await Customers.findOne({where:{email:req.body.reservation.email}})
         if(customer){
@@ -118,7 +129,7 @@ routes.post("/createReservation", async(req, res) => {
         temp.forEach(async(x)=>{
             const temp = await BookedTours.create({...x, CustomerId:customer.id});
             await BookedToursOptions.bulkCreate(createTourOptionReserves(x.options, temp.id));
-        })
+        });
         Notifications.create({
             description:"A Tour Booking has been made",
             checked:"0",
@@ -133,6 +144,12 @@ routes.post("/createReservation", async(req, res) => {
 routes.get("/getAllBookings", async(req, res) => {
     try {
         const result = await Reservations.findAll({
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
             include:[{
                 model:BookedTours,
                 include:[
@@ -177,7 +194,7 @@ routes.get("/getSalesReport", async(req, res) => {
                 createdAt: {
                     [Op.gte]: moment(req.headers.from).toDate(),
                     [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
-                  }
+                }
             },
             include:[{
                 model:BookedTours,
