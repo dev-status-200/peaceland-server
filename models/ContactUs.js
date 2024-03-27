@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
         msg:{
             type:DataTypes.TEXT
         },
+        status:{
+            type:DataTypes.STRING
+        },
     })
     return ContactUs
 }

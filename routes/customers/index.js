@@ -1,8 +1,11 @@
 const routes = require('express').Router();
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const Sib = require('sib-api-v3-sdk');
 const key = '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';
 const { BookedTours, BookedToursOptions, MyOffers } = require('../../associations/bookingaccociations');
 const { Reservations, Customers, ContactUs, Notifications } = require('../../models');
+const moment = require("moment");
 
 const sendMail = (reciever, sub, content) => {
     const client = Sib.ApiClient.instance
@@ -127,11 +130,26 @@ routes.post("/contactUs", async(req, res)=>{
 routes.get("/getContactUsMessages", async(req, res)=>{
     try {
         const result = await ContactUs.findAll({
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
             order: [
                 ["createdAt", "DESC"],
             ],
         })
         res.json({status:'success', result:result})
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.post("/toggleMessages", async(req, res)=>{
+    try {
+        await ContactUs.update({ status:req.body.status }, { where:{ id:req.body.id } })
+        res.json({status:'success'})
     } catch (error) {
         res.json({status:'error', result:error});
     }

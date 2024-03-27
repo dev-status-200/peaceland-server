@@ -5,7 +5,10 @@ module.exports = (sequelize, DataTypes) => {
         },
         child:{
             type:DataTypes.STRING
-        }
+        },
+        roomType:{
+            type:DataTypes.STRING
+        },
     })
     return Rooms
 }

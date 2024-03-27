@@ -356,10 +356,26 @@ routes.post("/createVisaForm", async(req, res) => {
 routes.get("/getVisaForms", async(req, res) => {
     try {
         const result = await VisaForm.findAll({
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
             include:[{ model:VisaPersons }],
             order: [[ 'createdAt', 'DESC' ]]
         });
         res.json({status:"success", result});
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.post("/toggleVisaForms", async(req, res) => {
+    try {
+        console.log(req.body)
+        await VisaForm.update({status:req.body.status},{ where:{id:req.body.id} })
+        res.json({status:"success"});
     } catch (error) {
         res.json({status:'error', result:error});
     }

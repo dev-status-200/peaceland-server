@@ -1,10 +1,11 @@
 const routes = require('express').Router();
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const { Tours, Reservations, Customers } = require('../../models');
+const { Tours, Reservations, Customers, PackageBooking } = require('../../models');
 const { TourOptions, BookedTours, BookedToursOptions } = require('../../associations/bookingaccociations');
 const { Inventory, History } = require('../../associations/inventoryAssociation');
 const cloudinary = require('cloudinary').v2;
+const moment = require("moment");
 
 cloudinary.config({ 
     cloud_name: 'abdullah7c', 
@@ -83,6 +84,47 @@ routes.post("/create", async(req, res)=>{
         const result = await Tours.create({...data, destination:'uae', slug:`${data.title}`.toLowerCase().replace(/\s+/g, '-')});
         await TourOptions.bulkCreate(createPackages(data.packages, result.id))
         res.json({status:'success', result:result})
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.post("/createPackageBooking", async(req, res)=>{
+    try {
+        console.log({...req.body})
+        const result = await PackageBooking.create({...req.body})
+        .catch((x)=>{
+            console.log(x)
+        })
+        res.json({status:'success', result})
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.get("/getPackageBooking", async(req, res)=>{
+    try {
+        const result = await PackageBooking.findAll({
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
+            order: [
+                ["createdAt", "DESC"],
+            ],
+        })
+        res.json({status:'success', result:result})
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
+routes.post("/togglePackage", async(req, res) => {
+    try {
+        await PackageBooking.update({status:req.body.status},{ where:{id:req.body.id} })
+        res.json({status:'success'})
     } catch (error) {
         res.json({status:'error', result:error});
     }
