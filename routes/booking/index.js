@@ -1,10 +1,6 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
-const p1 = 'xke'
-const p2 = 'ysi'
-const p3 = 'b-5e1'
-const p4 = '3993bf13705df2e2af4643e41f'
-const qeera = p1 + p2 + p2 + p4 + '4e2ac276c006767d6d0b366b0e4354d3188-                   jpmOczqVpi4h5uav';
+const key = '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';
 const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
 const { Reservations, Customers, Transport, Notifications, Promos } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
@@ -16,7 +12,7 @@ const Op = Sequelize.Op;
 const sendMail = (reciever, sub, content) => {
     const client = Sib.ApiClient.instance
     const apiKey = client.authentications['api-key'];
-    apiKey.apiKey = qeera;
+    apiKey.apiKey = key;
     const transEmailApi = new Sib.TransactionalEmailsApi();
 
     const sender = { email:'support@ticketsvalley.com', name:'Tickets Valley' }
