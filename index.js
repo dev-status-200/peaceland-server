@@ -12,12 +12,10 @@ const bookingRoutes = require('./routes/booking');
 const promoRoutes = require('./routes/promo');
 const destinationsRoutes = require('./routes/destinations');
 const customersRoutes = require('./routes/customers');
-// const { City, Destination } = require('./associations/bookingaccociations');
 
 app.use(morgan('tiny'));
 app.use(cors());
 
-//cron.schedule('0 */5 * * * *', () => console.log("Hello World"));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use(bodyParser.json({limit: '100mb', extended: true}));
 app.use(express.json());
