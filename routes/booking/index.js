@@ -1,6 +1,6 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
-const qeera = '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';
+//const qeera = // This is a zeeekaret qeyyy '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';
 const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
 const { Reservations, Customers, Transport, Notifications, Promos } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
