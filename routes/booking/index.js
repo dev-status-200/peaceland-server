@@ -1,6 +1,6 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
-const key = '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';
+const key = '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';
 const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
 const { Reservations, Customers, Transport, Notifications, Promos } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
@@ -64,9 +64,10 @@ routes.post("/create", async(req, res) => {
             
             <br/>
             <p>Regards</p>
-            <p>Ticket Valley Team</p>`
+            <p>Ticket Valley Team</p>
+            `
         
-        //await sendMail(req.body.user, 'Booking Info', content);
+        await sendMail(req.body.user, 'Booking Info', content);
         res.json({status:'success', result:"result"})
     } catch (error) {
         res.json({status:'error', result:error})
@@ -101,12 +102,9 @@ routes.post("/createReservation", async(req, res) => {
         let promo = req.body.reservation?.promo;
         if(promo!='none'){
             let promoId = JSON.parse(req.body.reservation?.promo).id;
-            console.log(promoId)
             const promoStock = await Promos.findOne({where:{id:promoId}});
-            // console.log(promoStock.dataValues);
             let stock = parseInt(promoStock.dataValues.stock)-1;
             let used = parseInt(promoStock.dataValues.used)+1||1;
-            // console.log(stock)
             Promos.update({stock:`${stock}`, used:`${used}`}, { where:{id:promoId} })
         }
         let customer;
@@ -123,6 +121,7 @@ routes.post("/createReservation", async(req, res) => {
         const lastBooking = await Reservations.findOne({ order: [[ 'booking_no', 'DESC' ]], attributes:["booking_no"]});
         const result = await Reservations.create({
             ...req.body.reservation,
+            site:req.body.site,
             booking_no:lastBooking==null?`${1}`:`${parseInt(lastBooking.booking_no)+1}`
         }).catch((x)=>console.log(x))
         let temp = createTourReserves(req.body.bookedTours, result.id)
@@ -257,7 +256,7 @@ routes.post("/assignTicket", async(req, res) => {
                 codes = codes + `${x.code}${i==req.body.tickets.length-1?"":", "}`
             })
         }
-        const result = await BookedToursOptions.update({assigned:"1", codes:codes},{where:{id:req.body.data.id}})
+        const result = await BookedToursOptions.update({assigned:"1", codes:codes},{where:{id:req.body.BookedTourOptionId}})
         if(!req.body.manual){
             req.body.tickets.forEach(async(x)=>{
                 await Inventory.upsert(x);
@@ -282,8 +281,8 @@ routes.post("/assignTicket", async(req, res) => {
 
 routes.post("/reverse", async(req, res) => {
     try {
-        const result = await BookedToursOptions.update({assigned:"0"},{where:{id:req.body.id}})
-        res.json({status:"success", result:"result"});
+        await BookedToursOptions.update({assigned:"0"},{where:{id:req.body.id}})
+        res.json({status:"success"});
     } catch (error) {
         res.json({status:'error', result:error});
     }

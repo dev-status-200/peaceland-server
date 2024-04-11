@@ -433,7 +433,7 @@ routes.get("/searchTour", async(req, res) => {
             }
         }
         const result = await Tours.findAll({
-            attributes:['id', 'title', 'main_image', 'category', 'advCategory', 'duration'],
+            attributes:['id', 'title', 'main_image', 'category', 'advCategory', 'duration', 'slug'],
             where:{
                 destination:req.headers.destination,
                 city:req.headers.city
@@ -519,6 +519,7 @@ routes.get("/getTourForEdit", async(req, res)=>{
 
 routes.get("/tourSearch", async(req, res)=>{
     try {
+        console.log(req.headers)
         const result = await Tours.findAll({
             where:{
                 [Op.or]: [

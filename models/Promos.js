@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
             type:DataTypes.STRING,
             defaultValue: '0',
         },
+        minimum:{
+            type:DataTypes.STRING,
+            defaultValue: '0',
+        },
     })
     return Promos
 }

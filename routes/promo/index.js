@@ -1,12 +1,11 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
-const key = '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';
+const key = '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';
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const { Promos, Customers } = require('../../models');
 const { MyOffers } = require('../../associations/bookingaccociations');
 const moment = require("moment");
-const stripe = require('stripe')('sk_test_51LLnm5AckUCD1b2U12xLKiqgm0IfjVzDmqPfS84MYtmTwNjUgUMx6c0PTMNjhWvbjBPhriAuHwe7ozzCjUgO8xvk00aHtMtqoC');
 
 const sendMail = (reciever, sub, content) => {
     const client = Sib.ApiClient.instance
