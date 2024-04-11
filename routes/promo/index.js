@@ -157,7 +157,7 @@ routes.post("/verifyPromo", async(req, res)=>{
         const result = await Promos.findOne({
             where:{
                 code:req.body.code, status:"1"
-            }
+            },
         })
         let date1 = moment(result.dataValues.validity).format("MM-DD-yyyy");
         let date2 = moment().format("MM-DD-yyyy");
