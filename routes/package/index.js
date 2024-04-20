@@ -20,7 +20,7 @@ const createPackages = (arrz, id) => {
         if(x.id==""){
             results.push({
                 name:x.name, child_price:x.child_price, adult_price:x.adult_price, status:x.status , stock:x.stock, TourId:id,
-                dated:x.dated, timed:x.timed, dates:x.dates, timeSlots:x.timeSlots
+                dated:x.dated, timed:x.timed, dates:x.dates, timeSlots:x.timeSlots, detail:x.detail, oldPrice:x.oldPrice
             })
         }
     })
@@ -276,7 +276,7 @@ routes.get("/getDetailsById", async(req, res)=>{
                 'cancellation_polices', 'more_images', 'main_image', 'advCategory', 'category',
                 'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'tour_detail', 'prevPrice',
                 'travelDetail', 'packageIncludes', 'packageDescription', 'packageCity', 'packageCountry',
-                'packageTravel'
+                'packageTravel', 'cutOff'
             ],
             include:includes
         })
@@ -397,15 +397,14 @@ routes.get("/getAllHistories", async(req, res)=>{
 });
 
 routes.get("/searchTourPeaceland", async(req, res) => {
-    try {
-        let obj = { };
-        req.headers.destination?obj.destination = req.headers.destination:null;
-        req.headers.category?obj.category = req.headers.category:null;
-        req.headers.city?obj.city = req.headers.city:null;
-
-        console.log(obj)
-
-        const result = await Tours.findAll({
+  try {
+    let obj = {
+            status:'1'
+    };
+    req.headers.destination?obj.destination = req.headers.destination:null;
+    req.headers.category?obj.category = req.headers.category:null;
+    req.headers.city?obj.city = req.headers.city:null;
+    const result = await Tours.findAll({
             attributes:['id','title','main_image','category','advCategory', 'slug', 'city', 'destination', 'duration'],
             where:obj,
             include:[{
@@ -413,24 +412,22 @@ routes.get("/searchTourPeaceland", async(req, res) => {
                 limit:1,
                 attributes:['id','adult_price']
             }]
-        });
-        console.log(result)
-        res.json({status:'success', result:result});
-    } catch (error) {
-        res.json({status:'error', result:error})
-    }
+    });
+    res.json({status:'success', result:result});
+  } catch (error) {
+    res.json({status:'error', result:error})
+  }
 });
 
 routes.get("/searchTour", async(req, res) => {
     try {
-        console.log(req.headers.city)
-        let obj = {    };
+        let obj = { status:'1' };
         if(req.headers.date!=""){
-            obj = {
-                dates:{
-                    [Op.contains]:[{ date: req.headers.date }]
-                }
+          obj = {
+            dates:{
+              [Op.contains]:[{ date: req.headers.date }]
             }
+          }
         }
         const result = await Tours.findAll({
             attributes:['id', 'title', 'main_image', 'category', 'advCategory', 'duration', 'slug'],

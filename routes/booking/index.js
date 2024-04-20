@@ -290,7 +290,11 @@ routes.post("/reverse", async(req, res) => {
 
 routes.post("/bookHotel", async(req, res) => {
     try {
-        const result = await HotelForm.create({...req.body});
+        const lastBooking = await HotelForm.findOne({ order: [[ 'booking_no', 'DESC' ]], attributes:["booking_no"]});
+        const result = await HotelForm.create({
+            ...req.body,
+            booking_no:lastBooking==null?`${1}`:`${parseInt(lastBooking.booking_no)+1}`
+        });
         req.body.rooms.forEach((x)=>{
             Rooms.create({...x, HotelFormId:result.id});
         });
@@ -335,7 +339,11 @@ routes.get("/markHotelQueryDOne", async(req, res) => {
 routes.post("/createVisaForm", async(req, res) => {
     try {
         //VisaForm, VisaPersons
-        const result = await VisaForm.create();
+        const lastBooking = await VisaForm.findOne({ order: [[ 'booking_no', 'DESC' ]], attributes:["booking_no"]});
+        const result = await VisaForm.create({
+            booking_no:lastBooking==null?1:lastBooking.booking_no+1
+        });
+        console.log(result)
         req.body.persons.forEach((x)=>{
             VisaPersons.create({
                 ...x, VisaFormId:result.id

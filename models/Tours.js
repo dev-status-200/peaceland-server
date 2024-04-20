@@ -82,6 +82,9 @@ module.exports = (sequelize, DataTypes) => {
         travelDetail:{
             type:DataTypes.TEXT,
         },
+        cutOff:{
+            type:DataTypes.STRING,
+        },
     })
     return Tours
 }

@@ -40,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
             type:DataTypes.STRING,
             defaultValue: '0'
         },
+        booking_no: {
+            type: DataTypes.INTEGER,
+        },
     })
     return HotelForm
 }

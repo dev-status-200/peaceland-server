@@ -36,7 +36,8 @@ routes.post("/disable", async(req, res) => {
 
 routes.get("/get", async(req, res)=>{
     try {
-        const result = await Transport.findAll();
+        const result = await Transport.findAll()
+        .catch((x)=>console.log(x))
         res.json({status:'success', result:result})
     } catch (error) {
         res.json({status:'error'})

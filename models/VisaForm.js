@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
             validate:{
                 notEmpty: true
             }
-        }
+        },
+        booking_no: {
+            type: DataTypes.INTEGER,
+        },
     })
     return VisaForm
 }
