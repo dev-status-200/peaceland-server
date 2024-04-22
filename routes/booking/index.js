@@ -1,6 +1,7 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
-const key = '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';
+// const key = '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'; <Ticketsvalley Key
+const key = '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';
 const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
 const { Reservations, Customers, Transport, Notifications, Promos } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
@@ -9,15 +10,18 @@ const stripe = require('stripe')('sk_test_51LLnm5AckUCD1b2U12xLKiqgm0IfjVzDmqPfS
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-const sendMail = (reciever, sub, content) => {
+const sendMail = (reciever, sub, content, site) => {
     const client = Sib.ApiClient.instance
     const apiKey = client.authentications['api-key'];
     apiKey.apiKey = key;
     const transEmailApi = new Sib.TransactionalEmailsApi();
 
-    const sender = { email:'support@ticketsvalley.com', name:'Tickets Valley' }
+    const sender = { 
+      email:site=="peaceland"?'info@peacelandtravel.com':'support@ticketsvalley.com',
+      name:site=="peaceland"?"Peaceland Travel":"Ticketsvalley"
+    }
     const recievers = [ { email:reciever, }, ];
-    console.log(recievers)
+
     transEmailApi.sendTransacEmail({
       sender,
       to: recievers,
@@ -25,7 +29,7 @@ const sendMail = (reciever, sub, content) => {
       htmlContent:content,
     }).then((x)=>console.log(x))
     .catch((e)=>console.log(e));
-}
+};
 
 const createTourReserves = (list, id) => {
     let resultOne = [];
@@ -36,7 +40,7 @@ const createTourReserves = (list, id) => {
         })
     })
     return resultOne;
-}
+};
 
 const createTourOptionReserves = (list, id) => {
     let resultOne = [];
@@ -52,22 +56,19 @@ const createTourOptionReserves = (list, id) => {
         delete resultOne[i].id
     })
     return resultOne;
-}
+};
 
 routes.post("/create", async(req, res) => {
     try {
-        const content = 
-            `<p>Dear Customer</p>
-            <p>Thank you for using Tickets Valley</p>
-            <p>Your Booking Has been recieved you'll shorlty recieve your ticket</p>
-            <p>Your Booking No. is <b>${req.body.booking_no}</b></p>
-            
-            <br/>
-            <p>Regards</p>
-            <p>Ticket Valley Team</p>
-            `
-        
-        await sendMail(req.body.user, 'Booking Info', content);
+        const content = `<p>Dear Customer</p>
+        <p>Thank you for using Tickets Valley</p>
+        <p>Your Booking Has been recieved you'll shorlty recieve your ticket</p>
+        <p>Your Booking No. is <b>${req.body.booking_no}</b></p>
+        <br/>
+        <p>Regards</p>
+        <p>${req.body.site=='ticketsvalley'?'Ticket Valley':'Peaceland Travel'} Team</p>`
+        console.log("here 1")
+        await sendMail(req.body.user, 'Booking Info', content, req.body.site);
         res.json({status:'success', result:"result"})
     } catch (error) {
         res.json({status:'error', result:error})
@@ -98,46 +99,46 @@ routes.post("/create-intent", async(req, res) => {
 });
 
 routes.post("/createReservation", async(req, res) => {
-    try {
-        let promo = req.body.reservation?.promo;
-        if(promo!='none'){
-            let promoId = JSON.parse(req.body.reservation?.promo).id;
-            const promoStock = await Promos.findOne({where:{id:promoId}});
-            let stock = parseInt(promoStock.dataValues.stock)-1;
-            let used = parseInt(promoStock.dataValues.used)+1||1;
-            Promos.update({stock:`${stock}`, used:`${used}`}, { where:{id:promoId} })
-        }
-        let customer;
-        customer = await Customers.findOne({where:{email:req.body.reservation.email}})
-        if(customer){
-        } else {
-            let obj = {
-                name:req.body.reservation.name,
-                image:req.body.reservation.image,
-                email:req.body.reservation.email,
-            }
-            customer = await Customers.create(obj);
-        }
-        const lastBooking = await Reservations.findOne({ order: [[ 'booking_no', 'DESC' ]], attributes:["booking_no"]});
-        const result = await Reservations.create({
-            ...req.body.reservation,
-            site:req.body.site,
-            booking_no:lastBooking==null?`${1}`:`${parseInt(lastBooking.booking_no)+1}`
-        }).catch((x)=>console.log(x))
-        let temp = createTourReserves(req.body.bookedTours, result.id)
-        temp.forEach(async(x)=>{
-            const temp = await BookedTours.create({...x, CustomerId:customer.id});
-            await BookedToursOptions.bulkCreate(createTourOptionReserves(x.options, temp.id));
-        });
-        Notifications.create({
-            description:"A Tour Booking has been made",
-            checked:"0",
-            type:'tour'
-        })
-        res.json({status:"success", result:{id:result.id, no:result.booking_no}});
-    } catch (error) {
-        res.json({status:'error', result:error})
+  try {
+    console.log(req.body)
+    let promo = req.body.reservation?.promo;
+    if(promo!='none'){
+      let promoId = JSON.parse(req.body.reservation?.promo).id;
+      const promoStock = await Promos.findOne({where:{id:promoId}});
+      let stock = parseInt(promoStock.dataValues.stock)-1;
+      let used = parseInt(promoStock.dataValues.used)+1||1;
+      Promos.update({stock:`${stock}`, used:`${used}`}, { where:{id:promoId} })
     }
+    let customer;
+    customer = await Customers.findOne({where:{email:req.body.reservation.email}})
+    if(customer){ } else {
+      let obj = {
+      name:req.body.reservation.name,
+      image:req.body.reservation.image,
+      email:req.body.reservation.email,
+      }
+      customer = await Customers.create(obj);
+    }
+    const lastBooking = await Reservations.findOne({ order: [[ 'booking_no', 'DESC' ]], attributes:["booking_no"]});
+    const result = await Reservations.create({
+      ...req.body.reservation,
+      site:req.body.site||'peaceland',
+      booking_no:lastBooking==null?`${1}`:`${parseInt(lastBooking.booking_no)+1}`
+    }).catch((x)=>console.log(x))
+    let temp = createTourReserves(req.body.bookedTours, result.id)
+    temp.forEach(async(x)=>{
+      const temp = await BookedTours.create({...x, CustomerId:customer.id});
+      await BookedToursOptions.bulkCreate(createTourOptionReserves(x.options, temp.id));
+    });
+    Notifications.create({
+      description:"A Tour Booking has been made",
+      checked:"0",
+      type:'tour'
+    })
+    res.json({status:"success", result:{id:result.id, no:result.booking_no}});
+  } catch (error) {
+    res.json({status:'error', result:error})
+  }
 });
 
 routes.get("/getAllBookings", async(req, res) => {
@@ -250,6 +251,7 @@ routes.get("/getTicketage", async(req, res) => {
 
 routes.post("/assignTicket", async(req, res) => {
     try {
+        console.log(req.body.site, "===================================")
         let codes = "";
         if(!req.body.manual){
             req.body.tickets.forEach((x, i)=>{
@@ -268,11 +270,12 @@ routes.post("/assignTicket", async(req, res) => {
         <p>Congratulations!</p>
         <p>Your ticket has been assigned!</p>
         <p>You can view your ticket in the link below!</p>
-        <a href="https://ticketsvalley.com/ticketPage?id=${req.body.ticketId}">Click this link to get your ticket</a>
+        <a href="https://${req.body.site=="ticketsvalley"?'ticketsvalley':'peacelandtravel'}.com/ticketPage?id=${req.body.ticketId}">Click this link to get your ticket</a>
         <br/>
         <p>Regards</p>
-        <p>Ticket Valley Team</p>`;
-        !req.body.manual? sendMail(req.body.email, 'Ticket Assigned', content):null;
+        <p>${req.body.site=="ticketsvalley"?'Ticket Valley Team':'Peaceland Travel Team'}</p>`;
+        console.log("here 2")
+        !req.body.manual? sendMail(req.body.email, 'Ticket Assigned', content, req.body.site):null;
         res.json({status:"success", result:result});
     } catch (error) {
         res.json({status:'error', result:error});
@@ -380,7 +383,6 @@ routes.get("/getVisaForms", async(req, res) => {
 
 routes.post("/toggleVisaForms", async(req, res) => {
     try {
-        console.log(req.body)
         await VisaForm.update({status:req.body.status},{ where:{id:req.body.id} })
         res.json({status:"success"});
     } catch (error) {
