@@ -240,7 +240,7 @@ routes.get("/getById", async(req, res)=>{
             attributes:[
                 'id', 'title' , 'availability', 'duration', 'time_slot', 'confirmation',
                 'refund', 'voucher', 'lang','city','destination', 'prevPrice',
-                'main_image', 'departure', 'reporting'
+                'main_image', 'departure', 'reporting', 'cutOff'
             ]
         })
         res.json({status:'success', result:result})
@@ -303,7 +303,8 @@ routes.get("/getAllSlugs", async(req, res)=>{
         console.log(type)
         const result = await Tours.findAll({
             where:{
-                package:type=="package"?'1':'0'
+                package:type=="package"?'1':'0',
+                status:'1'
             },
             attributes:['slug', 'id'],
         });
