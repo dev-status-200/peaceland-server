@@ -315,6 +315,12 @@ routes.post("/bookHotel", async(req, res) => {
 routes.get("/getHotelForms", async(req, res) => {
     try {
         const result = await HotelForm.findAll({
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
             order: [
                 ["createdAt", "DESC"],
             ],
