@@ -252,7 +252,7 @@ routes.get("/getById", async(req, res)=>{
 routes.get("/getBySlug", async(req, res)=>{
     try {
         const result = await Tours.findOne({
-            where:{slug:req.headers.id},
+            where:{slug:req.headers.id, status:'1'},
             attributes:[
                 'id', 'title' , 'availability', 'duration', 'time_slot', 'confirmation',
                 'refund', 'voucher', 'lang','city','destination',
