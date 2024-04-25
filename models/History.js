@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
         by:{
             type:DataTypes.STRING
         },
+        type:{
+            type:DataTypes.STRING
+        },
     })
     return History
 }

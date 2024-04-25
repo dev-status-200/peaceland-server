@@ -361,7 +361,72 @@ routes.get("/getTourInventoryStatus", async(req, res)=>{
 routes.post("/removeInventory", async(req, res)=>{
     try {
         const result = await Inventory.destroy({
-            where:{code:req.body}
+            where:{code:req.body.codes}
+        });
+        await History.create({
+            type:'Delete',
+            by:req.body.username,
+            stock:req.body.codes.length,
+            TourOptionId:req.body.tourId
+        })
+        console.log(req.body)
+        res.json({
+            status:'success', 
+            result:result
+        });
+    } catch (error) {
+        res.json({status:'error'})
+    }
+});
+
+routes.get("/getAssignedInventory", async(req, res)=>{
+    try {
+        //BookedTours, BookedToursOptions
+        const result = await BookedToursOptions.findAll({
+            raw:true,
+            where:{
+                assigned:"1",
+                codes: {
+                    [Op.ne]: ""
+                },
+                updatedAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
+            attributes:['codes', 'tourOptName', 'BookedTourId', 'updatedAt'],
+            include:[{
+                model:BookedTours,
+                attributes:['ReservationId'],
+                include:[{
+                    attributes:['email', 'name'],
+                    model:Reservations
+                }]
+            }]
+        });
+        res.json({
+            status:'success', 
+            result:result
+        });
+    } catch (error) {
+        res.json({status:'error'})
+    }
+});
+
+routes.get("/getAllInventory", async(req, res)=>{
+    try {
+        //BookedTours, BookedToursOptions
+        const result = await Inventory.findAll({
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
+            include:[{
+                model:TourOptions,
+                attributes:['name']
+            }]
         });
         res.json({
             status:'success', 
@@ -378,6 +443,12 @@ routes.get("/getAllHistories", async(req, res)=>{
             order: [
                 ["createdAt", "DESC"],
             ],
+            where:{
+                createdAt: {
+                    [Op.gte]: moment(req.headers.from).toDate(),
+                    [Op.lte]: moment(req.headers.to).add(1, 'days').toDate(),
+                }
+            },
             include:[
                 {
                     model:TourOptions,

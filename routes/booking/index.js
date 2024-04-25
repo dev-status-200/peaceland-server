@@ -1,7 +1,8 @@
 const routes = require('express').Router();
 const Sib = require('sib-api-v3-sdk');
 // const key = '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'; <Ticketsvalley Key
-const key = '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';
+const key = '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';
+
 const { BookedTours, BookedToursOptions, TourOptions, VisaForm, VisaPersons, HotelForm, Rooms } = require('../../associations/bookingaccociations');
 const { Reservations, Customers, Transport, Notifications, Promos } = require('../../models');
 const { Inventory } = require('../../associations/inventoryAssociation');
