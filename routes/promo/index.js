@@ -125,7 +125,9 @@ routes.get("/getMyPromos", async(req, res)=>{
 
 routes.get("/get", async(req, res)=>{
     try {
+        console.log(req.headers.type)
         const result = await Promos.findAll({
+            where:{status:req.headers.type=="active"?'1':'0'},
             order: [['createdAt', 'DESC']]
         })
         res.json({status:'success', result:result})

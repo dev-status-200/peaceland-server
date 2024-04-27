@@ -220,7 +220,7 @@ routes.get("/getByCategory", async(req, res)=>{
 routes.get("/getByBasicCategory", async(req, res)=>{
     try {
         const result = await Tours.findAll({
-            where:{category:req.headers.category},
+            where:{category:req.headers.category, status:'1'},
             attributes:["id", "main_image", "title"],
             include:[{
                 model:TourOptions,
@@ -471,7 +471,7 @@ routes.get("/getAllHistories", async(req, res)=>{
 routes.get("/searchTourPeaceland", async(req, res) => {
   try {
     let obj = {
-            status:'1'
+        status:'1'
     };
     req.headers.destination?obj.destination = req.headers.destination:null;
     req.headers.category?obj.category = req.headers.category:null;
@@ -493,7 +493,7 @@ routes.get("/searchTourPeaceland", async(req, res) => {
 
 routes.get("/searchTour", async(req, res) => {
     try {
-        let obj = { status:'1' };
+        let obj = { };
         if(req.headers.date!=""){
           obj = {
             dates:{
@@ -505,7 +505,8 @@ routes.get("/searchTour", async(req, res) => {
             attributes:['id', 'title', 'main_image', 'category', 'advCategory', 'duration', 'slug'],
             where:{
                 destination:req.headers.destination,
-                city:req.headers.city
+                city:req.headers.city,
+                status:'1'
             },
             include:[{
                 model:TourOptions,
