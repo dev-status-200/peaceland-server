@@ -57,6 +57,20 @@ routes.get("/getCustomers", async(req, res)=>{
     }
 });
 
+routes.post("/createNewsLetterCustomer", async(req, res)=>{
+    try {
+        console.log(req.body.email)
+        await Customers.create({
+            email:req.body.email
+        }).catch((x)=>{
+            console.log(x)
+        })
+        res.json({status:'success'});
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
 routes.post("/sendReviewRequest", async(req, res)=>{
     try {
         console.log(req.body)
