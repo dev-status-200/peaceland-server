@@ -122,7 +122,7 @@ routes.get("/getMyPromos", async(req, res)=>{
         res.json({status:'error'})
     }
 });
-
+//
 routes.get("/get", async(req, res)=>{
     try {
         console.log(req.headers.type)
