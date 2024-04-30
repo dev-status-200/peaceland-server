@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
         inclusions:{
             type:DataTypes.TEXT('long'),
         },
+        exclusions:{
+            type:DataTypes.TEXT('long'),
+        },
         why_shoulds:{
             type:DataTypes.TEXT('long'),
         },

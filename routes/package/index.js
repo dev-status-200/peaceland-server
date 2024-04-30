@@ -274,7 +274,7 @@ routes.get("/getDetailsById", async(req, res)=>{
             where:{id:req.headers.id},
             attributes:[
                 'cancellation_polices', 'more_images', 'main_image', 'advCategory', 'category',
-                'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'tour_detail', 'prevPrice',
+                'policies', 'imp_infos' , 'why_shoulds', 'inclusions', 'exclusions', 'tour_detail', 'prevPrice',
                 'travelDetail', 'packageIncludes', 'packageDescription', 'packageCity', 'packageCountry',
                 'packageTravel', 'cutOff'
             ],

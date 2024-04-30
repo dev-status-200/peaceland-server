@@ -58,6 +58,11 @@ module.exports = (sequelize, DataTypes) => {
         type:DataTypes.STRING,
         allowNull: false,
     },
+    uncheck:{
+      type:DataTypes.STRING,
+      allowNull: false,
+      defaultValue: '1',
+    },
   })
   return Reservations
 }

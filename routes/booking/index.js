@@ -188,6 +188,20 @@ routes.get("/getAllBookings", async(req, res) => {
     }
 });
 
+routes.post("/uncheckBooking", async(req, res) => {
+    try {
+        await Reservations.update(
+            {uncheck:'0'},{
+            where:{id:req.body.id}
+        }).catch((x)=>{
+            console.log(x)
+        })
+        res.json({status:"success"});
+    } catch (error) {
+        res.json({status:'error', result:error});
+    }
+});
+
 routes.get("/getSalesReport", async(req, res) => {
     try {
         const result = await Reservations.findAll({
