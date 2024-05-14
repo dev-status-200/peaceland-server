@@ -20,7 +20,8 @@ const createPackages = (arrz, id) => {
         if(x.id==""){
             results.push({
                 name:x.name, child_price:x.child_price, adult_price:x.adult_price, status:x.status , stock:x.stock, TourId:id,
-                dated:x.dated, timed:x.timed, dates:x.dates, timeSlots:x.timeSlots, detail:x.detail, oldPrice:x.oldPrice
+                dated:x.dated, timed:x.timed, dates:x.dates, timeSlots:x.timeSlots, detail:x.detail, oldPrice:x.oldPrice,
+                transport:x.transport, manual:x.manual
             })
         }
     })
@@ -34,7 +35,6 @@ const createupdatedPackages = (arrz, id) => {
             results.push({...x, TourId:id})
         }
     })
-    console.log(results)
     return results;
 }
 
@@ -72,8 +72,7 @@ const setRecords = (data, user) => {
                 })  
             }
         }
-    })
-    console.log(temp);
+    });
     return temp;
 }
 
@@ -91,11 +90,7 @@ routes.post("/create", async(req, res)=>{
 
 routes.post("/createPackageBooking", async(req, res)=>{
     try {
-        console.log({...req.body})
-        const result = await PackageBooking.create({...req.body})
-        .catch((x)=>{
-            console.log(x)
-        })
+        const result = await PackageBooking.create({...req.body});
         res.json({status:'success', result})
     } catch (error) {
         res.json({status:'error', result:error});
@@ -172,7 +167,6 @@ routes.post("/edit", async(req, res) => {
 
 routes.get("/get", async(req, res)=>{
     try {
-        console.log()
         let type = req.headers.type
         const result = await Tours.findAll({
             where:{package:type=="package"?"1":"0"},
@@ -258,8 +252,6 @@ routes.get("/getBySlug", async(req, res)=>{
                 'refund', 'voucher', 'lang','city','destination',
                 'main_image', 'departure', 'reporting', 'slug'
             ]
-        }).catch((x)=>{
-            console.log(x)
         })
         res.json({status:'success', result:result})
     } catch (error) {
@@ -300,7 +292,6 @@ routes.get("/getAllIds", async(req, res)=>{
 routes.get("/getAllSlugs", async(req, res)=>{
     try {
         const type = req.headers.type
-        console.log(type)
         const result = await Tours.findAll({
             where:{
                 package:type=="package"?'1':'0',
@@ -369,7 +360,6 @@ routes.post("/removeInventory", async(req, res)=>{
             stock:req.body.codes.length,
             TourOptionId:req.body.tourId
         })
-        console.log(req.body)
         res.json({
             status:'success', 
             result:result
@@ -589,7 +579,6 @@ routes.get("/getTourForEdit", async(req, res)=>{
 
 routes.get("/tourSearch", async(req, res)=>{
     try {
-        console.log(req.headers)
         const result = await Tours.findAll({
             where:{
                 [Op.or]: [
