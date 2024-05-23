@@ -4,7 +4,7 @@ let defaultClient = brevo.ApiClient.instance;
 function mainSend(reciever, sub, content) {
     console.log("here")
     let apiKey = defaultClient.authentications['api-key'];
-    apiKey.apiKey = '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';
+    apiKey.apiKey = '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';
     let apiInstance = new brevo.TransactionalEmailsApi();
     let sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.subject = "My {{params.subject}}";
