@@ -62,7 +62,7 @@ const createTourOptionReserves = (list, id) => {
 routes.post("/create", async(req, res) => {
     try {
         const content = `<p>Dear Customer</p>
-        <p>Thank you for using Tickets Valley</p>
+        <p>Thank you for using ${req.body.site=='ticketsvalley'?'Ticket Valley':'Peaceland Travel'}</p>
         <p>Your Booking Has been recieved you'll shorlty recieve your ticket</p>
         <p>Your Booking No. is <b>${req.body.booking_no}</b></p>
         <br/>
@@ -246,6 +246,7 @@ routes.post("/getMyBookings", async(req, res) => {
 
 routes.get("/getTicketage", async(req, res) => {
     try {
+        console.log(req.headers)
         const result = await Reservations.findOne({
             where:{id:req.headers.id},
             include:[{
@@ -266,7 +267,6 @@ routes.get("/getTicketage", async(req, res) => {
 
 routes.post("/assignTicket", async(req, res) => {
     try {
-        console.log(req.body.site, "===================================")
         let codes = "";
         if(!req.body.manual){
             req.body.tickets.forEach((x, i)=>{
@@ -278,18 +278,18 @@ routes.post("/assignTicket", async(req, res) => {
             req.body.tickets.forEach(async(x)=>{
                 await Inventory.upsert(x);
             })
-        }
+        }//
         const content = 
         `
         <p>Dear Customer</p>
         <p>Congratulations!</p>
         <p>Your ticket has been assigned!</p>
         <p>You can view your ticket in the link below!</p>
-        <a href="https://${req.body.site=="ticketsvalley"?'ticketsvalley':'peacelandtravel'}.com/ticketPage?id=${req.body.ticketId}">Click this link to get your ticket</a>
+        <a href="https://${req.body.site=="ticketsvalley"?`ticketsvalley.com/ticketPage?id=${req.body.ticketId}`:'peacelandtravel.com/myBookings'}">Click this link to view your ticket</a>
         <br/>
         <p>Regards</p>
         <p>${req.body.site=="ticketsvalley"?'Ticket Valley Team':'Peaceland Travel Team'}</p>`;
-        console.log("here 2")
+        // console.log("here 2")
         !req.body.manual? sendMail(req.body.email, 'Ticket Assigned', content, req.body.site):null;
         res.json({status:"success", result:result});
     } catch (error) {
